@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Oracle — Australian Lottery Analysis</title>
+  <meta name="description" content="Free Australian lottery analysis tool for Powerball, Oz Lotto, Saturday Lotto, Weekday Windfall, Set for Life, Super 66. Generate lucky numbers, view hot & cold stats, browse draw history.">
+  <meta name="keywords" content="lottery, powerball, oz lotto, saturday lotto, number generator, lucky numbers, australian lottery, lottery analysis, set for life, super 66">
+  <meta name="author" content="Number Oracle">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Number Oracle — Australian Lottery Analysis">
+  <meta property="og:description" content="Free lottery number generator & analysis for all 6 Australian lottery games.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.numberoracle.online">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #root { min-height: 100vh; }
+    body { background: #06060f; color: #e2e8f0; font-family: system-ui, sans-serif; }
+
+    /* Loading screen */
+    #loading {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; flex-direction: column; gap: 16px;
+    }
+    #loading .spinner {
+      width: 40px; height: 40px; border: 3px solid rgba(249,115,22,.2);
+      border-top-color: #f97316; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    #loading p { font-size: 14px; color: #475569; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error screen */
+    #error-screen {
+      display: none; text-align: center; padding: 40px 20px;
+      min-height: 100vh; justify-content: center; align-items: center;
+      flex-direction: column; gap: 12px;
+    }
+    #error-screen h2 { color: #ef4444; font-size: 20px; }
+    #error-screen p { color: #64748b; font-size: 14px; max-width: 400px; }
+    #error-screen button {
+      background: #f97316; color: white; border: none; padding: 12px 24px;
+      border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Loading Number Oracle...</p>
+  </div>
+
+  <!-- Error fallback -->
+  <div id="error-screen">
+    <div style="font-size: 48px;">⚠️</div>
+    <h2>Something went wrong</h2>
+    <p id="error-msg">The app failed to load. Please try refreshing the page.</p>
+    <button onclick="location.reload()">Refresh Page</button>
+  </div>
+
+  <!-- React app mounts here -->
+  <div id="root"></div>
+
+  <!-- React 18 + Babel (production CDN) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Load the lottery app -->
+  <script>
+    // Global error handler
+    window.onerror = function(msg, src, line, col, err) {
+      console.error('App error:', msg, src, line);
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-screen').style.display = 'flex';
+      document.getElementById('error-msg').textContent = 'Error: ' + msg;
+      return true;
+    };
+
+    // Fetch and run the JSX file
+    fetch('lottery-prediction-bot.jsx?v=' + Date.now())
+      .then(function(res) {
+        if (!res.ok) throw new Error('Failed to load app: HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(jsxCode) {
+        try {
+          // Transform JSX to JS using Babel
+          var transformed = Babel.transform(jsxCode, {
+            presets: ['react'],
+            plugins: [],
+          }).code;
+
+          // Create a module-like environment
+          var moduleCode = transformed
+            .replace(/^import\s+.*?from\s+['"]react['"];?\s*$/gm, '')
+            .replace(/^import\s+\{[^}]*\}\s+from\s+['"]react['"];?\s*$/gm, '')
+            .replace(/^export\s+default\s+/gm, 'var AppComponent = ');
+
+          // Add React hooks to global scope
+          var hookNames = [
+            'useState', 'useEffect', 'useCallback', 'useRef', 'useMemo',
+            'useReducer', 'useContext', 'useLayoutEffect', 'memo', 'Fragment'
+          ];
+          var hookSetup = hookNames.map(function(h) {
+            return 'var ' + h + ' = React.' + h + ';';
+          }).join('\n');
+
+          // Execute the code
+          var fullCode = hookSetup + '\n' + moduleCode;
+          var fn = new Function(fullCode + '\nreturn AppComponent;');
+          var App = fn();
+
+          // Hide loading, render app
+          document.getElementById('loading').style.display = 'none';
+
+          var root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(React.createElement(App));
+
+        } catch (e) {
+          console.error('Babel/render error:', e);
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error-screen').style.display = 'flex';
+          document.getElementById('error-msg').textContent = 'Compile error: ' + e.message;
+        }
+      })
+      .catch(function(err) {
+        console.error('Fetch error:', err);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-screen').style.display = 'flex';
+        document.getElementById('error-msg').textContent = 'Load error: ' + err.message;
+      });
+  </script>
+</body>
+</html>
