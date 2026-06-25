@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+const { useState, useEffect, useCallback, useRef, useMemo } = React;
 
 /* ═══════════════════════════════════════════════════════
    ALL THE LOTT GAMES (thelott.com) — official formats
@@ -158,6 +158,7 @@ const REAL_DATA = {
     { date: "2026-03-19", numbers: [4,9,18,20,22,25,35], bonus: 15 },
     { date: "2026-03-26", numbers: [5,9,20,22,24,25,28], bonus: 20 },
     { date: "2026-04-02", numbers: [20,23,27,30,32,34,35], bonus: 18 },
+    { date: "2026-04-09", numbers: [3,15,17,26,27,32,33], bonus: 20 },
   ],
   saturday: [
     { date: "2026-01-03", numbers: [9,10,13,19,21,36] },
@@ -189,6 +190,7 @@ const REAL_DATA = {
     { date: "2026-03-17", numbers: [2,6,18,24,25,45,47] },
     { date: "2026-03-24", numbers: [6,9,22,24,25,27,34] },
     { date: "2026-03-31", numbers: [8,17,18,31,35,43,44] },
+    { date: "2026-04-07", numbers: [3,10,17,20,24,37,39] },
   ],
   weekday: [
     { date: "2026-01-23", numbers: [1,2,20,23,32,37] },
@@ -499,7 +501,7 @@ function Particles() {
 }
 
 /* ═══════ MAIN APP ═══════ */
-export default function LotteryBot() {
+function LotteryBot() {
   const [ageVerified, setAgeVerified] = useState(false);
   const [ageBlocked, setAgeBlocked] = useState(false);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
@@ -1402,3 +1404,7 @@ export default function LotteryBot() {
     </div>
   );
 }
+
+
+// ── Mount the app ──────────────────────────────────────
+ReactDOM.createRoot(document.getElementById("root")).render(<LotteryBot />);
