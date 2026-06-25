@@ -1,3 +1,0 @@
-Move your existing legal.html into this public/ folder (rename it to legal.html).
-Files in public/ are served at the site root, so it will be reachable at /legal.html,
-which is exactly what your footer links point to.
