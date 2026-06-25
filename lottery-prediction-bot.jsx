@@ -623,6 +623,19 @@ function LotteryBot() {
     if (nums) setSavedSets(p => [...p, { numbers: nums, bonus: generated ? genBonus : null, strategy: strat, game, ts: new Date().toLocaleString() }]);
   };
 
+  const [shareMsg, setShareMsg] = useState("");
+  const shareNumbers = (nums, bonus, stratLabel) => {
+    const numsText = nums.join(", ") + (bonus ? ` + ${cfg.bonusName}: ${bonus}` : "");
+    const text = `My Number Oracle picks for ${cfg.name}: ${numsText}\n\nGet your lucky numbers free at numberoracle.online`;
+    if (navigator.share) {
+      navigator.share({ title: `Number Oracle — ${cfg.name}`, text: text }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(text);
+      setShareMsg("Copied!");
+      setTimeout(() => setShareMsg(""), 2000);
+    }
+  };
+
   const cBg = "rgba(255,255,255,.025)";
   const cBd = "1px solid rgba(255,255,255,.06)";
   const gameKeys = Object.keys(GAMES);
@@ -885,6 +898,10 @@ function LotteryBot() {
                     background: "rgba(255,255,255,.05)", border: cBd,
                     color: "#94a3b8", padding: "5px 14px", borderRadius: 7, cursor: "pointer", fontFamily: "'Space Mono'", fontSize: 9,
                   }}>💾 Save</button>
+                  <button onClick={() => shareNumbers(generated, genBonus, activeStrat)} style={{
+                    background: "rgba(59,130,246,.12)", border: "1px solid rgba(59,130,246,.25)",
+                    color: "#60a5fa", padding: "5px 14px", borderRadius: 7, cursor: "pointer", fontFamily: "'Space Mono'", fontSize: 9,
+                  }}>{shareMsg || "📤 Share"}</button>
                 </div>
                 <div style={{ marginTop: 10, fontFamily: "'Space Mono'", fontSize: 9, color: "#334155" }}>
                   {STRATS.find(s => s.key === activeStrat)?.label} strategy · {cur.length} draws analysed
@@ -1159,6 +1176,10 @@ function LotteryBot() {
                       background: "rgba(16,185,129,.15)", border: "1px solid rgba(16,185,129,.3)",
                       color: "#10b981", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontFamily: "'Space Mono'", fontSize: 10, fontWeight: 700,
                     }}>💾 Save Numbers</button>
+                    <button onClick={() => shareNumbers(luckyResult, null, luckyMethod)} style={{
+                      background: "rgba(59,130,246,.12)", border: "1px solid rgba(59,130,246,.25)",
+                      color: "#60a5fa", padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontFamily: "'Space Mono'", fontSize: 10, fontWeight: 700,
+                    }}>{shareMsg || "📤 Share"}</button>
                   </div>
                   <div style={{ fontFamily: "'Space Mono'", fontSize: 9, color: "#475569", marginTop: 12 }}>
                     Unique to your personal input · {cfg.name} format · No one else gets these
@@ -1392,6 +1413,26 @@ function LotteryBot() {
             ].map(link => (
               <a key={link.label} href={`/legal.html#${link.tab}`} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'Space Mono'", fontSize: 8, color: "#334155", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 2 }}>{link.label}</a>
             ))}
+          </div>
+
+          {/* Social Follow */}
+          <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 14 }}>
+            <a href="https://www.instagram.com/justjimmydoing" target="_blank" rel="noopener noreferrer" style={{
+              display: "flex", alignItems: "center", gap: 6, textDecoration: "none",
+              background: "linear-gradient(135deg, rgba(228,64,95,.12), rgba(168,85,247,.12))",
+              border: "1px solid rgba(228,64,95,.2)", borderRadius: 8, padding: "6px 14px",
+            }}>
+              <span style={{ fontSize: 14 }}>📸</span>
+              <span style={{ fontFamily: "'Space Mono'", fontSize: 9, color: "#e4405f" }}>@justjimmydoing</span>
+            </a>
+            <a href="https://www.tiktok.com/@justjimmydoing" target="_blank" rel="noopener noreferrer" style={{
+              display: "flex", alignItems: "center", gap: 6, textDecoration: "none",
+              background: "rgba(255,255,255,.04)",
+              border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 14px",
+            }}>
+              <span style={{ fontSize: 14 }}>🎵</span>
+              <span style={{ fontFamily: "'Space Mono'", fontSize: 9, color: "#e2e8f0" }}>@justjimmydoing</span>
+            </a>
           </div>
 
           <div style={{ textAlign: "center", marginTop: 10 }}>
